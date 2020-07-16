@@ -1,16 +1,15 @@
----
-layout: default
----
-## About me
+I"<h2 id="about-me">About me</h2>
 
-I'm a PhD candidate in astronomy at [McMaster University](https://www.mcmaster.ca).
-<!-- I study the cold gas in nearby galaxies using radio telescopes. -->
+<p>I’m a PhD candidate in astronomy at <a href="https://www.mcmaster.ca">McMaster University</a>.
+<!-- I study the cold gas in nearby galaxies using radio telescopes. --></p>
 
-## My projects
+<h2 id="my-projects">My projects</h2>
 
-1. The gas and dust properties of transition galaxies
-2. The resolved correlation of _WISE_ 12 micron emission and CO
-3. How galactic bars and interactions drive gas inwards and trigger star formation
+<ol>
+  <li>The gas and dust properties of transition galaxies</li>
+  <li>The resolved correlation of <em>WISE</em> 12 micron with CO</li>
+  <li>How bar- and interaction-driven gas inflow and enhanced central star formation</li>
+</ol>
 
 <!-- ## My CV -->
 <!--
@@ -135,3 +134,4 @@ Long, single-line code blocks should not wrap. They should horizontally scroll i
 ```
 The final element.
 ``` -->
+:ET

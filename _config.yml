@@ -1,6 +1,6 @@
 title: Ryan Chown
 logo: /assets/img/logo.jpg
-description: PhD candidate at McMaster University
+# description: PhD candidate at McMaster University
 show_downloads: true
-google_analytics:
+# google_analytics:
 theme: jekyll-theme-minimal
