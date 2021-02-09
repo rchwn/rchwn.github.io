@@ -4,6 +4,6 @@ layout: default
 
 ## My CV
 
-_yay_
+Click [here](cv/cv.pdf) to download a copy of my CV.
 
 [back](./)
