@@ -3,7 +3,9 @@ layout: default
 ---
 ## About me
 
-I'm a PhD candidate in astronomy at [McMaster University](https://www.mcmaster.ca).
+I'm a PhD candidate in Astronomy at [McMaster University](https://www.mcmaster.ca). My supervisors are [Christine Wilson](https://www.physics.mcmaster.ca/~wilson/) and [Laura Parker](https://www.lcpastro.com). I study the interstellar medium and star formation in nearby galaxies. Prior to my PhD I was at [McGill University](https://www.mcgill.ca) where I received my BSc in Physics and MSc in Physics (supervisor: [Gil Holder](https://physics.illinois.edu/people/directory/profile/gholder), now at the University of Illinois). For my MSc I worked in the [South Pole Telescope](https://pole.uchicago.edu/public/) collaboration, making maps of the [cosmic microwave background](https://en.wikipedia.org/wiki/Cosmic_microwave_background).
+
+
 <!-- I study the cold gas in nearby galaxies using radio telescopes. -->
 
 <!-- ## My projects -->
@@ -13,5 +15,4 @@ I'm a PhD candidate in astronomy at [McMaster University](https://www.mcmaster.c
 <!-- 3. How galactic bars and interactions drive gas inwards and trigger star formation -->
 
 <!-- ## My CV -->
-<!--
 
