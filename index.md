@@ -9,11 +9,8 @@ I'm a PhD candidate in Astronomy at [McMaster University](https://www.mcmaster.c
 ## Contact
 
 A. N. Bourns Science Building
-
 ABB 244
-
 McMaster University 
-
 1280 Main St W, Hamilton, ON L8S 4L8
 
 Email: chownrj at mcmaster dot ca
