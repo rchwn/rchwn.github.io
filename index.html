@@ -1,8 +1,173 @@
----
-layout: default
-title: Ryan Chown
----
-<div class="blurb">
-	<h1>Ryan Chown</h1>
-	<p>I'm an astronomy PhD candidate at <li><a href="https://www.mcmaster.ca">McMaster University</a></li></p>
-</div><!-- /.blurb -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Chown - Research Website</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#cv">CV</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="profile-container">
+                <img src="figs/your-photo.jpg" alt="Ryan Chown" class="profile-photo">
+                <h1>Ryan Chown</h1>
+                <p class="subtitle">Postdoc in the Department of Astronomy at <a href="https://www.osu.edu" target="_blank">The Ohio State University</a></p>
+            </div>
+        </section>
+
+        <section id="research" class="research-section">
+            <h2>Current Research</h2>
+            <div class="research-summary">
+                <p>I am an observational astronomer interested in the interstellar medium (ISM), star formation, and galaxy evolution. My research leverages multi-wavelength observations from near-infrared to radio, using facilities such as <a href="https://webb.nasa.gov/" target="_blank">JWST</a>, <a href="https://www.spitzer.caltech.edu/" target="_blank">Spitzer</a>, <a href="https://almascience.nrao.edu" target="_blank">ALMA</a>, and the <a href="https://public.nrao.edu/telescopes/vla/" target="_blank">VLA</a> to study the gas and dust in galaxies, often in combination with shorter wavelength observations like optical integral field spectroscopy. My work spans from high-resolution studies of the Milky Way to spatially-resolved analysis of nearby galaxies, with a focus on understanding the physical processes that shape the interstellar medium across different environments and metallicities.</p>
+            </div>
+            <div class="research-grid">
+                <div class="research-item">
+                    <img src="figs/potm2411a.jpg" alt="galaxy research" class="research-image">
+                    <h3>The life cycle of fundamental ingredients of the ISM in nearby galaxies</h3>
+                    <p>Cold molecular gas (H₂) is the fuel for star formation, but it is not directly observable. Instead, astronomers use radio wavelength emission from the second-most abundant molecule, carbon monoxide (CO), to trace this gas. Much of my recent work has focused on a) understanding an apparently ubiquitous relationship between CO emission and mid-infrared emission from another important class of molecules called polycyclic aromatic hydrocarbons (<a href="https://en.wikipedia.org/wiki/Polycyclic_aromatic_hydrocarbon" target="_blank">PAHs</a>), and b) understanding the life cycle of PAHs in the ISM. With JWST, we are now able to study the CO versus PAH relationship at unprecedented spatial resolution and sensitivity, allowing us to probe the structure of cold gas at a level of detail that is not possible with CO.</p> 
+                    <p>Image: JWST (NIRCam + MIRI) composite image of NGC 2090 showing dust and PAH emission (red) and starlight (blue). <br>
+                    Credit: ESA/Webb, NASA & CSA, A. Leroy. <a href="https://esawebb.org/images/potm2411a" target="_blank">Link to original image.</a></p>
+     
+                    <button class="read-more" onclick="toggleDetails('research1')">Read More</button>
+                    
+                    <div id="research1" class="research-details">
+                        <h4>Overview</h4>
+                        <p>As a postdoc at <a href="https://www.osu.edu" target="_blank">The Ohio State University</a>, I'm conducting a comprehensive study of the relationship between cold gas (H₂ and HI) and polycyclic aromatic hydrocarbons (PAHs) across different galaxy environments. This work is done in collaboration with the Physics at High Angular Resolution in Nearby Galaxies Survey collaboration (<a href="https://sites.google.com/view/phangs/home" target="_blank">PHANGS</a>). My work spans from analyzing PHANGS-JWST images of nearly 75 massive spiral galaxies at ~50-150 pc resolution (one such image is shown above) to studying the nearest low-metallicity dwarf galaxies (NGC 6822 and the Wolf-Lundmark-Melotte galaxy, or WLM) at the unprecedented resolution of ~2 pc, where the structure of individual molecular clouds can be seen in great detail. The latter work is done in collaboration with the Local Group L-Band Survey team (<a href="https://www.lglbs.org" target="_blank">LGBS</a>). This multi-scale approach allows me to investigate how the CO-PAH relationship varies with metallicity and galactic environment. Characterizing this relationship across environments helps us establish PAH emission as a sensitive, high-resolution tracer of cold gas.</p>
+<!--                         
+                        <h4>Key Findings in Massive Spiral Galaxies (PHANGS-JWST)</h4>
+                        <ul>
+                            <li>Very strong correlations between CO and PAH emission across nearly 70 galaxies at ~100 pc resolution</li>
+                            <li>Strong correlation between galaxy-to-galaxy scatter and global star formation activity</li>
+                            <li>JWST provides ~10× higher resolution and ~10× more sensitivity as a tracer of cold gas compared to ALMA</li>
+                        </ul>
+
+                        <h4>Key Findings in Dwarf Galaxies (NGC 6822 and WLM)</h4>
+                        <ul>
+                            <li>Confirmation that PAH abundance is lower overall in low-metallicity environments</li>
+                            <li>Identification of variations among the ~200 pc-sized regions studied</li>
+                            <li>Discovery of systematic suppression in PAH abundance inside HII regions compared to their local environment</li>
+                            <li>Evidence that at solar metallicity, PAH and CO emission follow the same relationship, while global PAH-to-CO ratios are much higher at low metallicity</li>
+                        </ul> -->
+                        
+                        <h4>Image Gallery</h4>
+                        <div class="gallery">
+                            <figure>
+                                <img src="figs/fig1_scatter_co_vs_f770w_pah_all_20250116.png" alt="PHANGS-JWST image">
+                                <figcaption>ALMA CO(2-1) vs. 7.7 μm PAH emission across 70 galaxies at ~100 pc resolution. We find a strong correlation between CO and PAH emission across all galaxies. The relationship is well-fit by a power law with a slope of 0.98, similar to that found in previous work (Leroy et al. 2023) even though we considered over 10x more data. Figure from <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241005397C/abstract" target="_blank">Chown et al. (2025)</a>. </figcaption>
+                            </figure>
+                            <figure>
+                                <img src="figs/fig2_co_at_f770w_pah_scatter_vs_log_ssfr.png" alt="Dwarf galaxy JWST image">
+                                <figcaption>We found that individual galaxies show tight correlations between CO and PAH emission, and that the y-intercept of the relationship for a given galaxy is related to the star formation rate of that galaxy. This means that the CO-to-PAH ratio is higher in galaxies with higher star formation rates. It also means that one can obtain a better estimate of CO intensity from PAH intensity in a galaxy by estimating the y-intercept using the fit in this plot. Figure from <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241005397C/abstract" target="_blank">Chown et al. (2025)</a>.</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="figs/ngc2903_alma_co21_contour_and_predicted_from_f7770w.pdf" alt="ALMA image of molecular gas">
+                                <figcaption><b>Hey it works pretty well!</b> Proof of concept showing ALMA CO(2-1) intensity (left) and predicted CO intensity from PAH intensity (right) for NGC 2903. The predicted CO intensity is obtained by estimating the y-intercept of the relationship in the previous plot. One can see that the prediction is very good overall. Importantly, the predicted CO map is more sensitive -- work is ongoing to understand what this faint emission is actually tracing. One likely candidate is the low-density neutral hydrogen that pervades galaxies. Figure from <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241005397C/abstract" target="_blank">Chown et al. (2025)</a>.</figcaption>
+                            </figure>
+                            <!-- <figure>
+                                <img src="figs/orion_bar.png" alt="CO map of dwarf galaxy">
+                                <figcaption>ALMA CO(2-1) map of star-forming regions in WLM</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="figs/potm2411a.jpg" alt="Multi-wavelength comparison">
+                                <figcaption>Correlation between PAH and CO emission at 100 pc resolution in spiral galaxies</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="figs/orion_bar.png" alt="PAH vs CO correlation">
+                                <figcaption>PAH vs. CO correlation as a function of metallicity</figcaption>
+                            </figure> -->
+                        </div>
+                        
+                        <h4>Recent Publications: </h4>
+                        <p>1. R. Chown et al., "Polycyclic Aromatic Hydrocarbon and CO(2-1) Emission at 50-150 pc Scales in 70 Nearby Galaxies", <em>accepted for publication in ApJ (2025). <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241005397C/abstract" target="_blank">arXiv link.</a></em></p>
+                        <p>2. A. Leroy et al., "PHANGS-JWST First Results: Mid-infrared Emission Traces Both Gas Column Density and Heating at 100 pc Scales", <em>ApJL Volume 944, Issue 2 (2023). <a href="https://ui.adsabs.harvard.edu/abs/2023ApJ...944L...9L/abstract" target="_blank">arXiv link.</a></em></p>
+                        <p>3. R. Chown et al., "A new estimator of resolved molecular gas in nearby galaxies", <em>MNRAS Volume 500, Issue 2 (2021). <a href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.500.1261C/abstract" target="_blank">arXiv link.</a></em></p>
+                        <p>Images above from <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241005397C/abstract" target="_blank">Chown et al. (2025)</a> </p>
+                    </div>
+                </div>
+                <!-- <div class="research-item">
+                    <img src="figs/research-image-2.jpg" alt="Research on Dwarf Galaxies" class="research-image">
+                    <h3>Gas, Dust, and Star Formation in the Most Nearby Dwarf Galaxies</h3>
+                    <p>I'm interested in the gas, dust, and star formation in the most nearby dwarf galaxies. I'm particularly interested in the role of the interstellar medium in shaping the structure and evolution of these galaxies.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div> -->
+                <div class="research-item">
+                    <img src="figs/orion_bar.png" alt="pdrs4all" class="research-image">
+                    <h3>The Impact of Stars on Interstellar Dust in Our Own Backyard</h3>
+                    <p>During my postdoc at the University of Western Ontario, I led the first analysis on polycyclic aromatic hydrocarbon (PAH) emission from the JWST Early Release Science program #1288: PDRs4All, which mapped the Orion Bar, a prototypical star forming region in the Milky Way (you can see the Orion Nebula with your own eyes!). PAHs are everywhere. On Earth, PAHs are a common component of car exhaust and barbecue smoke. In space, they are a vital component of the interstellar medium, where they glow brightly in the near- to mid-infrared (roughly 3-15 μm). They are thought to be formed when stars shed their outer layers, and are then swept up into the ISM to lead busy and important lives. However, their formation and destruction processes are not well understood. The Orion Bar is the ideal region for studying the physical processes that influence PAH properties (this is one of the reasons why this JWST program was chosen to be one of 13 Early Release Science programs, whose data were taken in the first days of the mission). </p>
+                   
+                    <p>Image credit: ESA/Webb, NASA, CSA, Mahdi Zamani, PDRs4All</p>
+ 
+                    <button class="read-more" onclick="toggleDetails('research2')">Read More</button>
+
+                    <div id="research2" class="research-details">
+                        <h4>Overview</h4>
+                        <p>As part of the PDRs4All team, I led a paper where we discovered the first evidence of photo-processing of PAHs as a function of distance from ionizing stars within a single PDR. This research examined how radiation from massive stars affects the surrounding interstellar medium in the Milky Way. I produced what now represents a major reference for mid-infrared spectra of PDRs for years to come, and a catalog of PAH features, many of which were new discoveries. Along with this, I led an analysis comparing the uniquely high-quality imaging and integral field spectroscopy data, to produce empirical prescriptions for measuring spectral features (e.g. line intensities) from imaging data alone. These prescriptions can be used in other galaxies to estimate the intensity of spectral features from imaging data alone. </p>
+                        
+                        <h4>Image Gallery</h4>
+                        <div class="gallery">
+                            <figure>
+                                <img src="figs/bar.png" alt="Orion Bar PDR">
+                                <figcaption>JWST near- to mid-infrared image of the Orion Bar (the diagonal ridge of emission). Young stars from the Trapezium star cluster (to the upper right, outside of the image) ionize the surrounding gas (blue) and the Orion Bar is the "skin" of the molecular cloud, where the transition from ionized gas to atomic gas occurs. The material in the lower left is mostly molecular hydrogen. We obtained JWST integral field spectroscopy of a sub-region extending across the Bar (shown in the zoom in), allowing us to probe variations in PAH properties with varying physical conditions. Figure from <a href="https://ui.adsabs.harvard.edu/abs/2024A%26A...685A..75C/abstract" target="_blank">Chown et al. (2024)</a>. </figcaption>
+                            </figure>
+                            <figure>
+                                <img src="figs/spec.png" alt="Spectral analysis of PAH features">
+                                <figcaption>JWST spectrum of the Orion Bar, taken from the Atomic PDR aperture labelled above. PAH emission features are shown in red. Figure from <a href="https://ui.adsabs.harvard.edu/abs/2024A%26A...685A..75C/abstract" target="_blank">Chown et al. (2024)</a>.</figcaption>
+                            </figure>
+                        </div>
+                        
+                        <h4>Recent Publications</h4>
+                        <p>1. R. Chown et al., "PDRs4All. IV. An embarrassment of riches: Aromatic infrared bands in the Orion Bar", <em>A&A, 685 (2024). <a href="https://ui.adsabs.harvard.edu/abs/2024A%26A...685A..75C/abstract" target="_blank">arXiv link.</a></em></p>
+                        <p>2. R. Chown et al., "PDRs4All XI. Empirical prescriptions for the interpretation of JWST imaging observations of star-forming regions", <em>Submitted to A&A (2025). <a href="https://ui.adsabs.harvard.edu/abs/2024arXiv241106061C/abstract" target="_blank">arXiv link.</a></em></p>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cv" class="cv-section">
+            <h2>Curriculum Vitae</h2>
+            <p>Download my CV <a href="figs/cv.pdf">here</a>.</p>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <h2>Contact</h2>
+            <div class="contact-info">
+                <p>Email: <a href="mailto:chown.5@osu.edu">chown dot 5 at osu dot edu</a></p>
+                <p>Department of Astronomy <br> The Ohio State University <br>  Columbus, OH </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Ryan Chown. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleDetails(id) {
+            const detailsElement = document.getElementById(id);
+            const button = event.target;
+            
+            if (detailsElement.style.display === 'block') {
+                detailsElement.style.display = 'none';
+                button.textContent = 'Read More';
+            } else {
+                detailsElement.style.display = 'block';
+                button.textContent = 'Read Less';
+            }
+        }
+    </script>
+</body>
+</html> 
