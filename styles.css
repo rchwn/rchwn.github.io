@@ -75,6 +75,7 @@ section {
     position: relative;
 }
 
+
 .hero::before {
     content: '';
     position: absolute;
