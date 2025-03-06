@@ -45,7 +45,7 @@ nav ul li {
 nav ul li a {
     font-family: 'Lato', sans-serif;
     text-decoration: none;
-    color: #ffffff;
+    color: #ffffff; 
     font-weight: 500;
     transition: color 0.3s ease;
 }
@@ -94,8 +94,8 @@ section {
 }
 
 .profile-photo {
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 2rem;
