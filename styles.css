@@ -390,4 +390,58 @@ footer {
 .research-item a:hover,
 .research-details a:hover {
     color: #0056b3;
+}
+
+/* Telescope Gallery */
+.telescope-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0 3rem;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.telescope-item {
+    text-align: center;
+    width: 200px;
+}
+
+.telescope-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.telescope-image:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+}
+
+.telescope-caption {
+    margin-top: 0.75rem;
+    font-weight: 500;
+    color: #444;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Media query for mobile responsiveness */
+@media (max-width: 768px) {
+    .telescope-gallery {
+        gap: 1rem;
+    }
+    
+    .telescope-item {
+        width: 150px;
+    }
+    
+    .telescope-image {
+        width: 150px;
+        height: 150px;
+    }
 } 
