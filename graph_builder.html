@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graph Builder</title>
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --canvas:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#dedcd6;
+  --accent:#2F6FDE; --accent-soft:rgba(47,111,222,.15); --danger:#c62828; --danger-soft:rgba(198,40,40,.18);
+  --ok:#1b7f3b; --bad:#b3261e; --btn:#f1f0ec; --btn-hover:#e6e4de;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151517; --panel:#1f1f22; --canvas:#1a1a1d; --ink:#ececee; --muted:#a0a0a8; --line:#34343a;
+    --accent:#6d9cff; --accent-soft:rgba(109,156,255,.2); --danger:#ff6b6b; --danger-soft:rgba(255,107,107,.2);
+    --ok:#5fd18a; --bad:#ff8a80; --btn:#2a2a2f; --btn-hover:#34343a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151517; --panel:#1f1f22; --canvas:#1a1a1d; --ink:#ececee; --muted:#a0a0a8; --line:#34343a;
+  --accent:#6d9cff; --accent-soft:rgba(109,156,255,.2); --danger:#ff6b6b; --danger-soft:rgba(255,107,107,.2);
+  --ok:#5fd18a; --bad:#ff8a80; --btn:#2a2a2f; --btn-hover:#34343a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  display:flex;flex-direction:column;height:100vh;height:100dvh}
+header{padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel);
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+h1{font-size:17px;margin:0;font-weight:650;letter-spacing:-.01em}
+.tools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.group{display:flex;gap:6px;flex-wrap:wrap}
+button,select{font:inherit;font-size:14px;color:var(--ink);background:var(--btn);border:1px solid var(--line);
+  border-radius:8px;padding:5px 11px;cursor:pointer;min-height:34px}
+button:hover:not(:disabled),select:hover{background:var(--btn-hover)}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--btn)}
+.seg button{border:0;border-radius:0;background:transparent;min-width:64px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.palette{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sw{width:26px;height:26px;min-height:0;border-radius:50%;padding:0;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--ink)}
+.sw.none{background:linear-gradient(135deg,transparent 44%,var(--muted) 44% 56%,transparent 56%),var(--canvas)}
+main{flex:1;display:flex;min-height:0}
+.stage{flex:1;position:relative;min-width:0;background:var(--canvas);overflow:hidden}
+#board{position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+.hint{position:absolute;left:14px;right:14px;top:10px;font-size:13px;color:var(--muted);pointer-events:none;z-index:1;max-width:640px}
+aside{width:330px;flex:none;border-left:1px solid var(--line);background:var(--panel);overflow:auto;padding:6px 18px 24px}
+aside h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 8px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:var(--bg);border-radius:8px;padding:6px 10px}
+.stats b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;color:var(--muted)}
+.row{margin-top:10px}
+.k{display:block;font-size:12.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.chip{background:var(--bg);border-radius:6px;padding:1px 7px;font-variant-numeric:tabular-nums;font-size:14px}
+.chip i,.v{font-family:"STIX Two Text","Cambria Math","Times New Roman",serif;font-size:16px}
+.muted{color:var(--muted);font-size:13.5px;margin:4px 0}
+.good{color:var(--ok)} .bad{color:var(--bad)}
+textarea{width:100%;min-height:76px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+.opts label{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:14px}
+details{margin-top:18px;font-size:14px}
+details summary{cursor:pointer;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+details ul{padding-left:18px;margin:8px 0}
+details li{margin:4px 0}
+kbd{font:12px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--panel);
+  padding:8px 14px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}
+#toast.show{opacity:1;transform:translateX(-50%)}
+
+.hit{fill:none;stroke:transparent;stroke-width:18;pointer-events:stroke;cursor:grab}
+.vhit{fill:transparent;stroke:none;pointer-events:all;cursor:pointer}
+.lbl{cursor:text}
+.ehit:hover{stroke:var(--accent-soft)}
+.vhit:hover{fill:var(--accent-soft)}
+body[data-mode="colour"] .hit, body[data-mode="colour"] .lbl,
+body[data-mode="delete"] .hit, body[data-mode="delete"] .lbl{cursor:pointer}
+body[data-mode="delete"] .ehit:hover{stroke:var(--danger-soft)}
+body[data-mode="delete"] .vhit:hover{fill:var(--danger-soft)}
+.ring{fill:none;stroke:var(--accent);stroke-width:2.5}
+
+@media (max-width:820px){
+  body{height:auto}
+  main{flex-direction:column}
+  .stage{flex:none;height:62vh}
+  aside{width:auto;border-left:0;border-top:1px solid var(--line)}
+  .seg button{min-width:0}
+}
+</style>
+</head>
+<body data-mode="build">
+<header>
+  <h1>Graph Builder</h1>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="Mode">
+      <button data-mode="build" aria-pressed="true" title="Add vertices and edges, move, bend (B)">Build</button>
+      <button data-mode="colour" aria-pressed="false" title="Colour vertices and edges (C)">Colour</button>
+      <button data-mode="delete" aria-pressed="false" title="Delete vertices and edges (D)">Delete</button>
+    </div>
+    <div class="palette" id="palette" aria-label="Colours"></div>
+    <div class="group">
+      <button id="undo" title="Undo (Ctrl/⌘ Z)">Undo</button>
+      <button id="redo" title="Redo (Ctrl/⌘ Shift Z)">Redo</button>
+    </div>
+    <select id="preset" aria-label="Load a graph"><option value="">Load a graph…</option></select>
+    <div class="group">
+      <button id="scramble" title="Move every vertex somewhere random. It's the same graph.">Scramble</button>
+      <button id="circle" title="Put the vertices evenly on a circle">Circle</button>
+      <button id="tidy" title="Straighten edges (multiple edges stay separated)">Straighten edges</button>
+      <button id="clear">Clear</button>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="stage">
+    <div class="hint" id="hint"></div>
+    <svg id="board" xmlns="http://www.w3.org/2000/svg"></svg>
+  </section>
+  <aside>
+    <h2>This graph</h2>
+    <div id="info"></div>
+
+    <h2>Colouring check</h2>
+    <div id="colinfo"></div>
+
+    <h2>Vertex and edge sets</h2>
+    <textarea id="list" spellcheck="false" aria-label="Vertex and edge sets"></textarea>
+    <p class="muted" id="listmsg">Type the edge set, e.g. <code>E = {(a,b), (a,c), (b,c)}</code>. Repeat a pair for multiple edges and use <code>(c,c)</code> for a loop. Add <code>V = {a, b, c, d}</code> to include isolated vertices.</p>
+    <button id="drawlist">Draw this list</button>
+
+    <h2>Options</h2>
+    <div class="opts">
+      <label><input type="checkbox" id="showdeg"> Show degrees on the drawing</label>
+      <label>New vertices are labelled
+        <select id="labelstyle"><option value="letters">a, b, c, …</option><option value="numbers">1, 2, 3, …</option></select>
+      </label>
+    </div>
+    <div class="group" style="margin-top:10px">
+      <button id="copylink">Copy link to this graph</button>
+      <button id="dlsvg">Download SVG</button>
+    </div>
+
+    <details>
+      <summary>How to use</summary>
+      <ul>
+        <li><b>Build</b>: This can be done in different ways. 1) Click an empty space to add a vertex. To add an edge, click one vertex, then another, to join them with an edge. Click the same vertex twice to add a loop. 2) Type out a vertex set and edge set in the box above. This must be done in set notation. </li>
+        <li>Drag a vertex to move it. Drag an edge to bend it. This works in every mode.</li>
+        <li>Click a label to rename the vertex.</li>
+        <li><b>Colour</b>: pick a colour, then click vertices or edges. The crossed-out colour removes a colour.</li>
+        <li><b>Delete</b>: click a vertex or edge. Deleting a vertex deletes its edges too.</li>
+        <li><b>Scramble</b> and <b>Circle</b> redraw the same graph with the vertices in new places. Nothing in the side panel changes.</li>
+        <li>Shortcuts: <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> switch modes, <kbd>1</kbd>–<kbd>8</kbd> pick a colour, <kbd>0</kbd> no colour, <kbd>Esc</kbd> cancels an edge, <kbd>Ctrl/⌘ Z</kbd> undoes.</li>
+      </ul>
+    </details>
+  </aside>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const PALETTE = [['blue','#2F6FDE'],['orange','#E8730C'],['green','#1E9E50'],['red','#D93636'],
+                 ['purple','#8E4FD0'],['teal','#0EA1A8'],['brown','#9A6A3A'],['pink','#D9479A']];
+const TAU = Math.PI*2, LOOP_W = 0.5;
+
+let G = {V:[], E:[]}, nid = 1;
+let mode = 'build', pending = null, cur = 0, showDeg = false, labelStyle = 'letters';
+let undoS = [], redoS = [], drag = null, anim = null, W = 800, H = 600;
+const svg = $('#board'), stage = $('.stage'), ta = $('#list');
+
+const V = id => G.V.find(v => v.id === id);
+const isLoop = e => e.u === e.v;
+const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const f1 = x => Math.round(x*10)/10;
+const plural = (k, w, ws) => `${k} ${k===1 ? w : (ws || w+'s')}`;
+
+/* ---------- undo ---------- */
+function snap(){ return JSON.stringify(G); }
+function pushUndo(){ undoS.push(snap()); if (undoS.length > 300) undoS.shift(); redoS = []; }
+function restore(s){
+  G = JSON.parse(s);
+  nid = 1 + Math.max(0, ...G.V.map(v => v.id), ...G.E.map(e => e.id));
+  pending = null; commit();
+}
+function undo(){ if (!undoS.length || anim) return; redoS.push(snap()); restore(undoS.pop()); }
+function redo(){ if (!redoS.length || anim) return; undoS.push(snap()); restore(redoS.pop()); }
+
+/* ---------- geometry ---------- */
+function geom(e){
+  const p = V(e.u);
+  if (isLoop(e)){
+    const s = e.len, a = e.ang;
+    const c1 = {x:p.x + s*Math.cos(a-LOOP_W), y:p.y + s*Math.sin(a-LOOP_W)};
+    const c2 = {x:p.x + s*Math.cos(a+LOOP_W), y:p.y + s*Math.sin(a+LOOP_W)};
+    return {d:`M${f1(p.x)},${f1(p.y)} C${f1(c1.x)},${f1(c1.y)} ${f1(c2.x)},${f1(c2.y)} ${f1(p.x)},${f1(p.y)}`};
+  }
+  const q = V(e.v);
+  const mx = (p.x+q.x)/2, my = (p.y+q.y)/2, dx = q.x-p.x, dy = q.y-p.y, L = Math.hypot(dx,dy) || 1;
+  const ux = dx/L, uy = dy/L, nx = -uy, ny = ux;
+  const hx = mx + e.t*L*ux + e.n*L*nx, hy = my + e.t*L*uy + e.n*L*ny;
+  const c = {x:2*hx - mx, y:2*hy - my};   // quadratic control point so the curve passes through (hx,hy)
+  return {d:`M${f1(p.x)},${f1(p.y)} Q${f1(c.x)},${f1(c.y)} ${f1(q.x)},${f1(q.y)}`, c};
+}
+function setHandle(e, pt){
+  const p = V(e.u);
+  if (isLoop(e)){
+    e.ang = Math.atan2(pt.y-p.y, pt.x-p.x);
+    e.len = clamp(Math.hypot(pt.x-p.x, pt.y-p.y) / (0.75*Math.cos(LOOP_W)), 24, 260);
+    return;
+  }
+  const q = V(e.v), dx = q.x-p.x, dy = q.y-p.y, L = Math.hypot(dx,dy);
+  if (L < 1) return;
+  const ux = dx/L, uy = dy/L, wx = pt.x-(p.x+q.x)/2, wy = pt.y-(p.y+q.y)/2;
+  e.t = clamp((wx*ux + wy*uy)/L, -1.5, 1.5);
+  e.n = clamp((-wx*uy + wy*ux)/L, -3, 3);
+}
+function angDist(a, b){ let d = Math.abs(a-b) % TAU; return d > Math.PI ? TAU-d : d; }
+function incidentDirs(vid){
+  const p = V(vid), out = [];
+  for (const e of G.E){
+    if (isLoop(e)){ if (e.u === vid) out.push(e.ang-LOOP_W, e.ang, e.ang+LOOP_W); continue; }
+    if (e.u !== vid && e.v !== vid) continue;
+    const c = geom(e).c;
+    out.push(Math.atan2(c.y-p.y, c.x-p.x));
+  }
+  return out;
+}
+// direction around a vertex that is furthest from its edges (for loops and labels)
+function freeAngle(vid, pref){
+  const dirs = incidentDirs(vid);
+  if (!dirs.length) return pref;
+  let best = pref, bs = -Infinity;
+  for (let i = 0; i < 24; i++){
+    const a = -Math.PI + i*Math.PI/12;
+    const s = Math.min(...dirs.map(d => angDist(a,d))) - 0.05*angDist(a, pref);
+    if (s > bs){ bs = s; best = a; }
+  }
+  return best;
+}
+
+/* ---------- graph edits ---------- */
+function nextLabel(){
+  const used = new Set(G.V.map(v => v.label));
+  if (labelStyle === 'numbers'){ for (let i = 1;; i++) if (!used.has(String(i))) return String(i); }
+  for (const c of 'abcdefghijklmnopqrstuvwxyz') if (!used.has(c)) return c;
+  for (let i = 1;; i++) if (!used.has('v'+i)) return 'v'+i;
+}
+function addVertex(x, y, label){
+  const v = {id:nid++, label:label ?? nextLabel(), x, y, color:null};
+  G.V.push(v); return v;
+}
+function offsetsBetween(u, v){
+  return G.E.filter(e => !isLoop(e) && ((e.u===u && e.v===v) || (e.u===v && e.v===u)))
+            .map(e => e.u === u ? e.n : -e.n);
+}
+function addEdge(u, v){
+  if (u === v){
+    G.E.push({id:nid++, u, v, color:null, ang:freeAngle(u, -Math.PI/2), len:44});
+    return;
+  }
+  const ns = offsetsBetween(u, v);
+  let n = (Math.random()-.5)*2;
+  for (const c of [0,.25,-.25,.5,-.5,.75,-.75,1,-1]) if (ns.every(x => Math.abs(x-c) > .1)){ n = c; break; }
+  G.E.push({id:nid++, u, v, color:null, t:0, n});
+}
+// add a batch of edges given as [u,v] id pairs: ordinary edges first so loops can avoid them
+function addEdges(pairs){
+  for (const [u,v] of pairs) if (u !== v) G.E.push({id:nid++, u, v, color:null, t:0, n:0});
+  tidyEdges();
+  for (const [u,v] of pairs) if (u === v) addEdge(u, v);
+}
+// straight edges, with multiple edges fanned out symmetrically
+function tidyEdges(){
+  const groups = new Map();
+  for (const e of G.E) if (!isLoop(e)){
+    const k = Math.min(e.u,e.v) + ',' + Math.max(e.u,e.v);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(e);
+  }
+  for (const list of groups.values()) list.forEach((e, i) => {
+    const n = (i - (list.length-1)/2) * 0.25;
+    e.t = 0; e.n = e.u < e.v ? n : -n;
+  });
+}
+function deleteVertex(id){
+  G.V = G.V.filter(v => v.id !== id);
+  G.E = G.E.filter(e => e.u !== id && e.v !== id);
+  if (pending === id) pending = null;
+}
+function rename(id){
+  const v = V(id);
+  const s = prompt(`Rename vertex ${v.label} to:`, v.label);
+  if (s == null) return;
+  const t = s.trim();
+  if (t === v.label) return;
+  if (!/^\w{1,8}$/.test(t)){ toast('Labels can use letters, digits and _ (up to 8 characters).'); return; }
+  if (G.V.some(w => w.label === t)){ toast(`There is already a vertex called ${t}.`); return; }
+  pushUndo(); v.label = t; commit();
+}
+
+/* ---------- analysis ---------- */
+function degrees(){
+  const deg = new Map(G.V.map(v => [v.id, 0]));
+  for (const e of G.E){ deg.set(e.u, deg.get(e.u)+1); deg.set(e.v, deg.get(e.v)+1); } // a loop adds 2
+  return deg;
+}
+function conflicts(){
+  const vc = new Set(), ec = new Set();
+  for (const e of G.E){
+    if (isLoop(e)) continue;
+    const a = V(e.u), b = V(e.v);
+    if (a.color != null && a.color === b.color) vc.add(e.id);
+  }
+  for (const v of G.V){
+    const by = {};
+    for (const e of G.E) if ((e.u === v.id || e.v === v.id) && e.color != null) (by[e.color] ??= []).push(e.id);
+    for (const k in by) if (by[k].length > 1) by[k].forEach(id => ec.add(id));
+  }
+  return {vc, ec, all:new Set([...vc, ...ec])};
+}
+
+/* ---------- drawing ---------- */
+function markup(exp){
+  const ink = exp ? '#1d1d1f' : 'var(--ink)', bg = exp ? '#ffffff' : 'var(--canvas)', muted = exp ? '#6b6b70' : 'var(--muted)';
+  const conf = conflicts().all, deg = degrees(), gs = new Map(G.E.map(e => [e.id, geom(e)]));
+  let s = '';
+  for (const e of G.E){
+    const col = e.color == null ? ink : PALETTE[e.color][1], w = e.color == null ? 2.2 : 3.6;
+    s += `<path d="${gs.get(e.id).d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"${conf.has(e.id) ? ' stroke-dasharray="8 6"' : ''}/>`;
+  }
+  if (!exp) for (const e of G.E) s += `<path class="hit ehit" data-kind="edge" data-id="${e.id}" d="${gs.get(e.id).d}"/>`;
+  if (!exp && pending != null){ const p = V(pending); s += `<circle class="ring" cx="${f1(p.x)}" cy="${f1(p.y)}" r="13"/>`; }
+  for (const v of G.V){
+    const col = v.color == null ? ink : PALETTE[v.color][1];
+    s += `<circle cx="${f1(v.x)}" cy="${f1(v.y)}" r="${v.color == null ? 5.5 : 7.5}" fill="${col}" stroke="${bg}" stroke-width="2"/>`;
+  }
+  if (!exp) for (const v of G.V) s += `<circle class="vhit" data-kind="vertex" data-id="${v.id}" cx="${f1(v.x)}" cy="${f1(v.y)}" r="15"/>`;
+  for (const v of G.V){
+    // label sits beside the dot, on the side with the most room
+    const a = freeAngle(v.id, -Math.PI/4), c = Math.cos(a), sn = Math.sin(a);
+    const x = v.x + 12*c, y = v.y + 12*sn + (sn > .35 ? 14 : sn < -.35 ? -1 : 6);
+    const anchor = c > .35 ? 'start' : c < -.35 ? 'end' : 'middle';
+    const d = showDeg ? `<tspan dx="3" font-size="13" font-style="normal" fill="${muted}">(${deg.get(v.id)})</tspan>` : '';
+    s += `<text${exp ? '' : ` class="lbl" data-kind="label" data-id="${v.id}"`} x="${f1(x)}" y="${f1(y)}" text-anchor="${anchor}" font-family="'STIX Two Text','Cambria Math','Times New Roman',serif" font-style="italic" font-size="19" fill="${ink}">${esc(v.label)}${d}</text>`;
+  }
+  return s;
+}
+function render(){ svg.innerHTML = markup(false); }
+
+function hint(){
+  $('#hint').textContent =
+    mode === 'build' ? (pending != null
+      ? 'Now click another vertex to draw an edge, or the same vertex again for a loop. Click empty space to cancel.'
+      : 'Click empty space to add a vertex. Click two vertices to join them. Drag a vertex to move it, or drag an edge to bend it.')
+    : mode === 'colour' ? 'Pick a colour, then click vertices or edges. Dragging still moves things.'
+    : 'Click a vertex or an edge to delete it.';
+}
+
+function info(){
+  const n = G.V.length, m = G.E.length, deg = degrees();
+  const sum = [...deg.values()].reduce((a,b) => a+b, 0);
+  const seq = [...deg.values()].sort((a,b) => b-a);
+  const loops = G.E.filter(isLoop).length;
+  const pc = new Map();
+  for (const e of G.E) if (!isLoop(e)){ const k = Math.min(e.u,e.v)+','+Math.max(e.u,e.v); pc.set(k, (pc.get(k)||0)+1); }
+  const multi = [...pc].filter(([,c]) => c > 1).map(([k,c]) => { const [a,b] = k.split(',').map(Number); return `<span class="v">${esc(V(a).label)}</span>–<span class="v">${esc(V(b).label)}</span> ×${c}`; });
+  const par = new Map(G.V.map(v => [v.id, v.id]));
+  const find = x => { while (par.get(x) !== x){ par.set(x, par.get(par.get(x))); x = par.get(x); } return x; };
+  for (const e of G.E) par.set(find(e.u), find(e.v));
+  const comps = new Set(G.V.map(v => find(v.id))).size;
+
+  let h = `<div class="stats"><div><b>${n}</b><span>vertices</span></div><div><b>${m}</b><span>edges</span></div><div><b>${comps}</b><span>${comps === 1 ? 'component' : 'components'}</span></div></div>`;
+  if (n){
+    h += `<div class="row"><span class="k">Degrees${loops ? ' (a loop adds 2)' : ''}</span><div class="chips">${G.V.map(v => `<span class="chip"><i>${esc(v.label)}</i> ${deg.get(v.id)}</span>`).join('')}</div></div>`;
+    h += `<div class="row"><span class="k">Degree sequence</span>(${seq.join(', ')})</div>`;
+    h += `<div class="row"><span class="k">Sum of degrees</span>${sum} = 2 × ${plural(m, 'edge')}</div>`;
+    const parts = [];
+    if (loops) parts.push(plural(loops, 'loop'));
+    if (multi.length) parts.push('multiple edges ' + multi.join(', '));
+    h += `<div class="row"><span class="k">Simple graph?</span>${parts.length ? 'No: ' + parts.join('; ') : 'Yes (no loops, no multiple edges)'}</div>`;
+    h += `<div class="row"><span class="k">Connected?</span>${comps === 1 ? 'Yes' : `No, it is in ${comps} pieces`}</div>`;
+  } else h += `<p class="muted">Empty. Click the canvas to add vertices, or load a graph from the menu.</p>`;
+  $('#info').innerHTML = h;
+
+  const {vc, ec} = conflicts();
+  const cv = G.V.filter(v => v.color != null), ce = G.E.filter(e => e.color != null);
+  let c = '';
+  if (!cv.length && !ce.length) c = `<p class="muted">Pick a colour and click vertices or edges. Clashes show up here and as dashed edges.</p>`;
+  if (cv.length){
+    const k = new Set(cv.map(v => v.color)).size, un = n - cv.length;
+    const line = vc.size ? `<span class="bad">✗ ${plural(vc.size, 'edge')} ${vc.size === 1 ? 'joins' : 'join'} two vertices of the same colour (dashed).</span>`
+      : loops ? `<span class="bad">✗ A vertex with a loop is adjacent to itself, so this graph has no proper vertex colouring.</span>`
+      : un ? `No clashes so far. ${plural(un, 'vertex', 'vertices')} still uncoloured.`
+      : `<span class="good">✓ Proper vertex colouring with ${plural(k, 'colour')}.</span>`;
+    c += `<div class="row"><span class="k">Vertex colouring</span>${line}</div>`;
+  }
+  if (ce.length){
+    const k = new Set(ce.map(e => e.color)).size, un = m - ce.length;
+    const line = ec.size ? `<span class="bad">✗ Edges of the same colour meet at a vertex (dashed).</span>`
+      : un ? `No clashes so far. ${plural(un, 'edge')} still uncoloured.`
+      : `<span class="good">✓ Proper edge colouring with ${plural(k, 'colour')}.</span>`;
+    c += `<div class="row"><span class="k">Edge colouring</span>${line}</div>`;
+  }
+  $('#colinfo').innerHTML = c;
+}
+
+function listText(){
+  if (!G.V.length) return '';
+  return 'V = {' + G.V.map(v => v.label).join(', ') + '}\n'
+       + 'E = {' + G.E.map(e => `(${V(e.u).label},${V(e.v).label})`).join(', ') + '}';
+}
+function syncList(){ if (document.activeElement !== ta) ta.value = listText(); }
+
+function commit(){
+  render(); info(); syncList(); hint();
+  $('#undo').disabled = !undoS.length; $('#redo').disabled = !redoS.length;
+}
+
+/* ---------- layouts ---------- */
+function margin(){ return Math.min(W, H) < 500 ? 50 : 80; }
+function unitToScreen(pos){
+  const mg = margin(), size = Math.max(60, Math.min(W, H) - 2*mg), ox = (W-size)/2, oy = (H-size)/2 + 10;
+  return pos.map(([x,y]) => [ox + x*size, oy + y*size]);
+}
+function circlePos(n){
+  if (n === 1) return [[W/2, H/2]];
+  const r = Math.max(60, Math.min(W, H)/2 - margin());
+  return Array.from({length:n}, (_, i) => [W/2 + r*Math.cos(-Math.PI/2 + TAU*i/n), H/2 + 10 + r*Math.sin(-Math.PI/2 + TAU*i/n)]);
+}
+function freeSpot(placed){
+  const mg = 50; let best = [W/2, H/2], bd = -1;
+  for (let i = 0; i < 60; i++){
+    const p = [mg + Math.random()*(W-2*mg), mg + 20 + Math.random()*(H-2*mg-20)];
+    const d = Math.min(Infinity, ...placed.map(q => Math.hypot(p[0]-q[0], p[1]-q[1])));
+    if (d > bd){ bd = d; best = p; }
+  }
+  return best;
+}
+function animateTo(targets){
+  if (!G.V.length) return;
+  pushUndo(); pending = null;
+  const from = G.V.map(v => [v.x, v.y]), t0 = performance.now();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step = now => {
+    let k = reduce ? 1 : Math.min(1, (now - t0)/550);
+    const e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2;
+    G.V.forEach((v, i) => { v.x = from[i][0] + (targets[i][0]-from[i][0])*e; v.y = from[i][1] + (targets[i][1]-from[i][1])*e; });
+    render();
+    if (k < 1) anim = requestAnimationFrame(step); else { anim = null; commit(); }
+  };
+  anim = requestAnimationFrame(step);
+}
+function scramble(){ const placed = []; animateTo(G.V.map(() => { const p = freeSpot(placed); placed.push(p); return p; })); }
+
+/* ---------- presets ---------- */
+const circ = (n, r = .5, cx = .5, cy = .5) => Array.from({length:n}, (_, i) => [cx + r*Math.cos(-Math.PI/2 + TAU*i/n), cy + r*Math.sin(-Math.PI/2 + TAU*i/n)]);
+const PRESETS = [
+  {name:'Path P₅', labels:'abcde', pos:[[0,.5],[.25,.5],[.5,.5],[.75,.5],[1,.5]], edges:'ab bc cd de'},
+  {name:'Cycle C₆', labels:'abcdef', pos:circ(6), edges:'ab bc cd de ef fa'},
+  {name:'Complete K₄', labels:'abcd', pos:[[0,0],[1,0],[1,1],[0,1]], edges:'ab ac ad bc bd cd'},
+  {name:'Complete K₅', labels:'abcde', pos:circ(5), edges:'ab ac ad ae bc bd be cd ce de'},
+  {name:'Complete bipartite K₂,₃', labels:'abcde', pos:[[.25,.1],[.75,.1],[0,.9],[.5,.9],[1,.9]], edges:'ac ad ae bc bd be'},
+  {name:'Complete bipartite K₃,₃', labels:'abcdef', pos:[[0,.1],[.5,.1],[1,.1],[0,.9],[.5,.9],[1,.9]], edges:'ad ae af bd be bf cd ce cf'},
+  {name:'Wheel (hub + 6-cycle)', labels:'abcdefg', pos:[[.5,.5], ...circ(6)], edges:'ab ac ad ae af ag bc cd de ef fg gb'},
+  {name:'Cube Q₃', labels:'abcdefgh', pos:[[0,0],[1,0],[1,1],[0,1],[.3,.3],[.7,.3],[.7,.7],[.3,.7]], edges:'ab bc cd da ef fg gh he ae bf cg dh'},
+  {name:'Petersen graph', labels:'abcdefghij', pos:[...circ(5), ...circ(5, .22)], edges:'ab bc cd de ea af bg ch di ej fh hj jg gi if'},
+  {name:'Königsberg bridges (multigraph)', labels:'ABCD', pos:[[.5,0],[.5,1],[.12,.5],[1,.5]], edges:'AC AC BC BC AD BD CD'},
+  {name:'Multigraph with loops', labels:'abc', pos:[[0,.85],[1,.85],[.5,.1]], edges:'ab ab ab bc ca cc aa'},
+];
+PRESETS.forEach((p, i) => $('#preset').insertAdjacentHTML('beforeend', `<option value="${i}">${p.name}</option>`));
+function loadPreset(i){
+  const p = PRESETS[i];
+  if (G.V.length) pushUndo();
+  G = {V:[], E:[]}; pending = null;
+  const pos = unitToScreen(p.pos), ids = {};
+  [...p.labels].forEach((l, k) => { ids[l] = addVertex(pos[k][0], pos[k][1], l).id; });
+  addEdges(p.edges.split(' ').map(s => [ids[s[0]], ids[s[1]]]));
+  commit();
+}
+
+/* ---------- edge list ---------- */
+function drawFromList(){
+  // accepts V = {a, b, c}, E = {(a,b), (a,c)} or {{a,b}, ...}, and plain a-b
+  const vtoks = [];
+  const raw = ta.value.replace(/[–—−]/g, '-')
+    .replace(/\bV\s*=\s*\{([^}]*)\}/g, (_, s) => { vtoks.push(...s.split(/[\s,;]+/).filter(Boolean)); return ' '; })
+    .replace(/\bE\s*=/g, ' ')
+    .replace(/[({]\s*(\w{1,8})\s*,\s*(\w{1,8})\s*[)}]/g, ' $1-$2 ')
+    .replace(/[{}]/g, ' ')
+    .replace(/\s*-+\s*/g, '-');
+  const toks = [...vtoks, ...raw.split(/[\s,;]+/).filter(Boolean)];
+  const labels = [], pairs = [], add = l => { if (!labels.includes(l)) labels.push(l); };
+  for (const t of toks){
+    const m = t.match(/^(\w{1,8})-(\w{1,8})$/);
+    if (m){ add(m[1]); add(m[2]); pairs.push([m[1], m[2]]); }
+    else if (/^\w{1,8}$/.test(t)) add(t);
+    else { $('#listmsg').innerHTML = `<span class="bad">Couldn't read “${esc(t)}”. Write the edges as pairs, like <code>E = {(a,b), (a,c)}</code>.</span>`; return; }
+  }
+  pushUndo();
+  const old = new Map(G.V.map(v => [v.label, v]));
+  const newV = labels.map(l => old.has(l) ? {...old.get(l)} : {id:nid++, label:l, x:0, y:0, color:null});
+  if (!labels.some(l => old.has(l))){
+    const pos = circlePos(newV.length); newV.forEach((v, i) => { v.x = pos[i][0]; v.y = pos[i][1]; });
+  } else {
+    const placed = newV.filter(v => old.has(v.label)).map(v => [v.x, v.y]);
+    for (const v of newV) if (!old.has(v.label)){ const q = freeSpot(placed); v.x = q[0]; v.y = q[1]; placed.push(q); }
+  }
+  G = {V:newV, E:[]}; pending = null;
+  const id = new Map(newV.map(v => [v.label, v.id]));
+  addEdges(pairs.map(([a,b]) => [id.get(a), id.get(b)]));
+  ta.blur(); commit();
+  $('#listmsg').textContent = `Drew ${plural(labels.length, 'vertex', 'vertices')} and ${plural(pairs.length, 'edge')}. Vertices already on the canvas kept their places.`;
+}
+
+/* ---------- sharing / export ---------- */
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function encode(){
+  const idx = new Map(G.V.map((v, i) => [v.id, i])), r3 = x => Math.round(x*1000)/1000;
+  const o = {v:G.V.map(v => [v.label, Math.round(v.x), Math.round(v.y), v.color]),
+             e:G.E.map(e => isLoop(e) ? [idx.get(e.u), idx.get(e.v), r3(e.ang), Math.round(e.len), e.color]
+                                      : [idx.get(e.u), idx.get(e.v), r3(e.t), r3(e.n), e.color])};
+  return btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+}
+function decode(str){
+  const o = JSON.parse(decodeURIComponent(escape(atob(str))));
+  G = {V:[], E:[]}; nid = 1;
+  const ids = o.v.map(([l, x, y, c]) => { const v = addVertex(x, y, l); v.color = c; return v.id; });
+  for (const [i, j, a, b, c] of o.e){
+    const u = ids[i], v = ids[j];
+    G.E.push(u === v ? {id:nid++, u, v, color:c, ang:a, len:b} : {id:nid++, u, v, color:c, t:a, n:b});
+  }
+  fitToView();
+}
+function fitToView(){
+  if (!G.V.length) return;
+  const xs = G.V.map(v => v.x), ys = G.V.map(v => v.y), mg = margin();
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const s = Math.min((W-2*mg)/((x1-x0) || 1), (H-2*mg)/((y1-y0) || 1), 2);
+  for (const v of G.V){ v.x = W/2 + (v.x - (x0+x1)/2)*s; v.y = H/2 + 10 + (v.y - (y0+y1)/2)*s; }
+}
+async function copyLink(){
+  const url = location.href.split('#')[0] + '#g=' + encode();
+  history.replaceState(null, '', url);
+  const note = location.protocol === 'file:' ? ' (it only opens on this computer until the page is hosted online)' : '';
+  try { await navigator.clipboard.writeText(url); toast('Link copied' + note + '.'); }
+  catch { prompt('Copy this link:', url); }
+}
+function downloadSVG(){
+  const s = `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(W)}" height="${Math.round(H)}" viewBox="0 0 ${f1(W)} ${f1(H)}"><rect width="100%" height="100%" fill="#ffffff"/>${markup(true)}</svg>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([s], {type:'image/svg+xml'}));
+  a.download = 'graph.svg'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------- input ---------- */
+function setMode(m){
+  mode = m; pending = null; document.body.dataset.mode = m;
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  render(); hint();
+}
+function setColour(i){
+  cur = i;
+  document.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', +b.dataset.c === i));
+  setMode('colour');
+}
+function pt(ev){ const r = svg.getBoundingClientRect(); return {x:ev.clientX - r.left, y:ev.clientY - r.top}; }
+
+function click(kind, id, p){
+  if (kind === 'label'){ if (mode === 'build'){ rename(id); return; } kind = 'vertex'; }
+  if (mode === 'build'){
+    if (kind === 'bg'){
+      if (pending != null){ pending = null; render(); hint(); }
+      else { pushUndo(); addVertex(p.x, p.y); commit(); }
+    } else if (kind === 'vertex'){
+      if (pending == null){ pending = id; render(); hint(); }
+      else { pushUndo(); addEdge(pending, id); pending = null; commit(); }
+    }
+  } else if (mode === 'colour'){
+    const col = cur < 0 ? null : cur;
+    const o = kind === 'vertex' ? V(id) : kind === 'edge' ? G.E.find(e => e.id === id) : null;
+    if (o && o.color !== col){ pushUndo(); o.color = col; commit(); }
+  } else if (mode === 'delete'){
+    if (kind === 'vertex'){ pushUndo(); deleteVertex(id); commit(); }
+    else if (kind === 'edge'){ pushUndo(); G.E = G.E.filter(e => e.id !== id); commit(); }
+  }
+}
+
+svg.addEventListener('pointerdown', ev => {
+  if (anim || ev.button > 0) return;
+  if (document.activeElement === ta) ta.blur();
+  const t = ev.target.closest('[data-kind]'), p = pt(ev);
+  drag = {kind:t ? t.dataset.kind : 'bg', id:t ? +t.dataset.id : null, x0:p.x, y0:p.y, moved:false,
+          thr:ev.pointerType === 'touch' ? 9 : 4};
+  svg.setPointerCapture(ev.pointerId);
+  ev.preventDefault();
+});
+svg.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  const p = pt(ev);
+  if (!drag.moved){
+    if (Math.hypot(p.x - drag.x0, p.y - drag.y0) < drag.thr) return;
+    drag.moved = true;
+    if (drag.kind !== 'bg') pushUndo();
+  }
+  if (drag.kind === 'vertex' || drag.kind === 'label'){
+    const v = V(drag.id); v.x = clamp(p.x, 6, W-6); v.y = clamp(p.y, 6, H-6); render();
+  } else if (drag.kind === 'edge'){
+    setHandle(G.E.find(e => e.id === drag.id), p); render();
+  }
+});
+svg.addEventListener('pointerup', ev => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (d.moved){ if (d.kind !== 'bg') commit(); return; }
+  click(d.kind, d.id, pt(ev));
+});
+svg.addEventListener('pointercancel', () => { if (drag && drag.moved && drag.kind !== 'bg') commit(); drag = null; });
+
+document.addEventListener('keydown', ev => {
+  if (/^(TEXTAREA|INPUT|SELECT)$/.test(ev.target.tagName)) return;
+  const k = ev.key.toLowerCase(), mod = ev.metaKey || ev.ctrlKey;
+  if (mod && k === 'z'){ ev.preventDefault(); ev.shiftKey ? redo() : undo(); return; }
+  if (mod && k === 'y'){ ev.preventDefault(); redo(); return; }
+  if (mod || ev.altKey) return;
+  if (k === 'escape'){ pending = null; render(); hint(); }
+  else if ((k === 'delete' || k === 'backspace') && pending != null){ ev.preventDefault(); pushUndo(); deleteVertex(pending); commit(); }
+  else if (k === 'b') setMode('build');
+  else if (k === 'c') setMode('colour');
+  else if (k === 'd') setMode('delete');
+  else if (/^[0-8]$/.test(k)) setColour(+k - 1);
+});
+
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+PALETTE.forEach(([name, hex], i) => $('#palette').insertAdjacentHTML('beforeend',
+  `<button class="sw" data-c="${i}" style="background:${hex}" title="${name} (${i+1})" aria-label="${name}" aria-pressed="${i === 0}"></button>`));
+$('#palette').insertAdjacentHTML('beforeend', `<button class="sw none" data-c="-1" title="No colour (0)" aria-label="no colour" aria-pressed="false"></button>`);
+document.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => setColour(+b.dataset.c)));
+$('#undo').onclick = undo;
+$('#redo').onclick = redo;
+$('#preset').onchange = e => { if (e.target.value !== ''){ loadPreset(+e.target.value); e.target.value = ''; } };
+$('#scramble').onclick = () => { if (!anim) scramble(); };
+$('#circle').onclick = () => { if (!anim) animateTo(circlePos(G.V.length)); };
+$('#tidy').onclick = () => { if (G.E.length){ pushUndo(); tidyEdges(); commit(); } };
+$('#clear').onclick = () => { if (G.V.length){ pushUndo(); G = {V:[], E:[]}; pending = null; commit(); } };
+$('#drawlist').onclick = drawFromList;
+ta.addEventListener('blur', () => setTimeout(syncList, 0));
+$('#showdeg').onchange = e => { showDeg = e.target.checked; render(); };
+$('#labelstyle').onchange = e => { labelStyle = e.target.value; };
+$('#copylink').onclick = copyLink;
+$('#dlsvg').onclick = downloadSVG;
+
+function measure(){
+  const r = stage.getBoundingClientRect();
+  W = r.width; H = r.height;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  for (const v of G.V){ v.x = clamp(v.x, 6, W-6); v.y = clamp(v.y, 6, H-6); }
+}
+new ResizeObserver(() => { measure(); render(); }).observe(stage);
+
+measure();
+let loaded = false;
+if (location.hash.startsWith('#g=')){
+  try { decode(location.hash.slice(3)); loaded = true; } catch { toast("That link's graph couldn't be read, so a sample graph was loaded."); }
+}
+if (!loaded) loadPreset(2);
+undoS = []; commit();
+</script>
+</body>
+</html>
