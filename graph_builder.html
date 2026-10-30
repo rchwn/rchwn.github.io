@@ -367,7 +367,9 @@ function hint(){
 function info(){
   const n = G.V.length, m = G.E.length, deg = degrees();
   const sum = [...deg.values()].reduce((a,b) => a+b, 0);
-  const seq = [...deg.values()].sort((a,b) => b-a);
+  // seq[k] = number of vertices of degree k
+  const seq = Array(Math.max(0, ...deg.values()) + 1).fill(0);
+  for (const d of deg.values()) seq[d]++;
   const loops = G.E.filter(isLoop).length;
   const pc = new Map();
   for (const e of G.E) if (!isLoop(e)){ const k = Math.min(e.u,e.v)+','+Math.max(e.u,e.v); pc.set(k, (pc.get(k)||0)+1); }
@@ -380,7 +382,7 @@ function info(){
   let h = `<div class="stats"><div><b>${n}</b><span>vertices</span></div><div><b>${m}</b><span>edges</span></div><div><b>${comps}</b><span>${comps === 1 ? 'component' : 'components'}</span></div></div>`;
   if (n){
     h += `<div class="row"><span class="k">Degrees${loops ? ' (a loop adds 2)' : ''}</span><div class="chips">${G.V.map(v => `<span class="chip"><i>${esc(v.label)}</i> ${deg.get(v.id)}</span>`).join('')}</div></div>`;
-    h += `<div class="row"><span class="k">Degree sequence</span>(${seq.join(', ')})</div>`;
+    h += `<div class="row"><span class="k">Degree sequence (number of vertices of degree 0, 1, 2, …)</span>(${seq.join(', ')})</div>`;
     h += `<div class="row"><span class="k">Sum of degrees</span>${sum} = 2 × ${plural(m, 'edge')}</div>`;
     const parts = [];
     if (loops) parts.push(plural(loops, 'loop'));
